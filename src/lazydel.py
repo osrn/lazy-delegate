@@ -150,7 +150,18 @@ def health_checks():
     embed1 = DiscordEmbed()
     embed2 = DiscordEmbed()
     tEvents = 0
-    for p in probes:
+
+    p = lastboot
+    if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
+        print('raised ', p.name)
+        embed1.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' Restart pending!')
+        tEvents += 1
+    if (not(p.isAlert) and (p.lastCeaseAt > lastProbeTime)):
+        print('ceased ', p.name)
+        embed2.add_embed_field(name=p.name, value='Restart pending')
+        tEvents += 1
+
+    for p in probes[1:]:
         if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
             print('raised ', p.name)
             embed1.add_embed_field(name=p.name, value=codeblock(p.value))
