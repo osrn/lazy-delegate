@@ -197,7 +197,7 @@ def heartbeat():
     embed = DiscordEmbed()
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node Stats**__")
-    restartNotif = ' Restart pending!' if lastboot.isAlert() else ''
+    restartNotif = ' Restart pending!' if lastboot.isAlert else ''
     embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value)+restartNotif)
     tAlert = lastboot.alertCount
     for p in probes[1:5]:
