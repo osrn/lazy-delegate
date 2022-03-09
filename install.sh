@@ -8,7 +8,7 @@ clear
 echo
 echo installing system dependencies
 echo ==============================
-sudo apt -qq install python3 python3-dev
+sudo apt -qq install python3 python3-dev python3-venv
 python3 -m pip install --user --upgrade pip
 python3 -m pip install --user virtualenv
 echo "done"
@@ -73,7 +73,7 @@ echo "cp src/config/config.example src/config/config"
 echo "vi src/config/config"
 echo 
 echo "3/ start the app"
-echo "cd src && pm2 start apps.json"
+echo "pm2 start apps.json"
 echo
 echo "4/ check status and logs"
 echo "pm2 status"

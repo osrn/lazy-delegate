@@ -34,7 +34,7 @@ __**Network status**__
 ## Installation
 **install the package via**
 ```bash
-cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/install.sh)
+cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh)
 ```
 
 **next, make sure pm2 is installed**
@@ -57,7 +57,7 @@ cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/instal
 ## Run
 start the app
 ```bash
-cd src && pm2 start apps.json
+cd ~/lazy-delegate && pm2 start apps.json
 ```
 
 check status and logs

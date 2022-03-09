@@ -36,38 +36,37 @@ def findJsonElement(json_obj, key, value):
     return element
 
 def getProcesses():
-    #['pm2-env']['version']
-    #['pm2-env']['status'] (online)
+    #['pm2_env']['version']
     try:
-        pm2status=json.loads(subprocess.run(['pm2','jlist'], capture_output=True, text=True))
+        pm2status=json.loads(subprocess.run(['pm2','jlist'], capture_output=True, text=True).stdout)
 
         ps=findJsonElement(pm2status, 'name', 'solar-relay')
         if (ps is not None):
-            relayproc.setValue(ps['pm2-env']['status'], lambda x: (x != 'online'))
+            relayproc.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
         else:
             relayproc.setValue('N/A', lambda x: (x != 'online'))
 
         ps=findJsonElement(pm2status, 'name', 'solar-forger')
         if (ps is not None):
-            forgerproc.setValue(ps['pm2-env']['status'], lambda x: (x != 'online'))
+            forgerproc.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
         else:
             forgerproc.setValue('N/A', lambda x: (x != 'online'))
 
         ps=findJsonElement(pm2status, 'name', 'tbw')
         if (ps is not None):
-            tbwcore.setValue(ps['pm2-env']['status'], lambda x: (x != 'online'))
+            tbwcore.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
         else:
             tbwcore.setValue('N/A', lambda x: (x != 'online'))
 
         ps=findJsonElement(pm2status, 'name', 'pay')
         if (ps is not None):
-            tbwpay.setValue(ps['pm2-env']['status'], lambda x: (x != 'online'))
+            tbwpay.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
         else:
             tbwpay.setValue('N/A', lambda x: (x != 'online'))
 
         ps=findJsonElement(pm2status, 'name', 'pool')
         if (ps is not None):
-            tbwpool.setValue(ps['pm2-env']['status'], lambda x: (x != 'online'))
+            tbwpool.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
         else:
             tbwpool.setValue('N/A', lambda x: (x != 'online'))
 
@@ -162,7 +161,7 @@ def health_checks():
             tEvents += 1
 
     if tEvents > 0:
-        embed0.set_author(name='DELEGATE **'+conf.delegate.upper()+"** Alert Status changed")
+        embed0.set_author(name='DELEGATE '+conf.delegate.upper()+" Alert Status changed")
         embeds=[embed0]
         if len(embed1.get_embed_fields()) > 0:
             embed1.set_title("Issues open:")
@@ -184,7 +183,7 @@ def heartbeat():
     embeds = []
 
     embed = DiscordEmbed()
-    embed.set_author(name='DELEGATE **'+conf.delegate.upper()+"** HEARTBEAT")
+    embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node Stats**__")
     embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value))
     embed.add_embed_field(name=cpuload.name, value=codeblock(cpuload.value)+'%')
