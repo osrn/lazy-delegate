@@ -1,0 +1,14 @@
+{
+    "apps": [{
+        "name": "lazy delegate",
+        "script": "src/lazydel.py",
+        "exec_interpreter": ".venv/bin/python3",
+	    "interpreter_args": "-u",
+        "instances": 1,
+        "exec_mode": "fork",
+        "autorestart": false,
+        "watch":false,
+        "log_date_format": "YYYY-MM-DD HH:mm Z",
+        "timestamp": "YYYY-MM-DD HH:mm Z"
+    }]
+}
