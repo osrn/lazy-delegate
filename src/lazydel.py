@@ -1,3 +1,4 @@
+from pdb import Restart
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 from os import path
 from util.probe import Probe
@@ -196,13 +197,11 @@ def heartbeat():
     embed = DiscordEmbed()
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node Stats**__")
-    embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value))
-    embed.add_embed_field(name=cpuload.name, value=codeblock(cpuload.value)+'%')
-    embed.add_embed_field(name=memusage.name, value=codeblock(memusage.value)+'%')
-    embed.add_embed_field(name=swapusage.name, value=codeblock(swapusage.value)+'%')
-    embed.add_embed_field(name=diskusage.name, value=codeblock(diskusage.value)+'%')
-    tAlert = 0
-    for p in probes[0:5]:
+    restartNotif = ' Restart pending!' if lastboot.isAlert() else ''
+    embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value)+restartNotif)
+    tAlert = lastboot.alertCount
+    for p in probes[1:5]:
+        embed.add_embed_field(name=p.name, value=str(p.value)+'%')
         tAlert += p.alertCount
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
@@ -214,7 +213,7 @@ def heartbeat():
     embed.set_title("__**Processes**__")
     tAlert = 0
     for p in probes[5:10]:
-        embed.add_embed_field(name=p.name, value=codeblock(p.value))
+        embed.add_embed_field(name=p.name, value=str(p.value))
         tAlert += p.alertCount
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
@@ -224,9 +223,9 @@ def heartbeat():
     embed.set_title("__**Network Stats**__")
     tAlert = 0
     for p in probes[10:]:
-        embed.add_embed_field(name=p.name, value=codeblock(p.value))
+        embed.add_embed_field(name=p.name, value=str(p.value))
         tAlert += p.alertCount
-    embed.set_footer(text='Stats by sol messenger')
+    embed.set_footer(text='Stats by Lazy Delegate')
     embed.set_timestamp()
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
