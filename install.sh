@@ -69,9 +69,10 @@ echo "or"
 echo "yarn global add pm2"
 echo
 echo "2/ copy config example and modify"
+echo "cd ~/lazy-delegate"
 echo "cp src/config/config.example src/config/config"
 echo "vi src/config/config"
-echo 
+echo
 echo "3/ start the app"
 echo "pm2 start apps.json"
 echo

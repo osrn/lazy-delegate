@@ -20,7 +20,7 @@ __**Network status**__
 - Forger missed blocks
 - Forger rank
 - Delegate voters
-  
+
 
 > _Project and most of the probe points were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
 
@@ -50,7 +50,7 @@ cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/i
 
 `cp src/config/config.example src/config/config`
 
-**Then edit:** 
+**Then edit:**
 
 `src/config/config`
 
@@ -69,6 +69,12 @@ pm2 logs
 save pm2 environment to start with pm2 at boot
 ```bash
 cd && pm2 save
+```
+
+### Maintenance
+Whenever the config file changes, app needs to be restarted
+```bash
+cd ~/lazy-delegate && pm2 restart apps.json
 ```
 
 ## Inside the mind

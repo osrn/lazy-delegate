@@ -8,11 +8,12 @@ SWAP_USE_THRESHOLD=90
 HDD_USE_THRESHOLD=70
 REBOOT_FILE='/var/run/reboot-required'
 
+## Processes
+CHK_FORGER=1
+CHK_TBW=1
+
 ## Network definitions
-LOCAL_API='http://127.0.0.1:6003/api'
-NET_API='https://sxp.testnet.sh/api'
-CHAIN_GITHUB='https://api.github.com/repos/Solar-network/core/releases'
-# Local IP 
+# Local IP
 NODE_LOCAL=127.0.0.1
 # API server port
 API_PORT=6003
@@ -20,6 +21,10 @@ API_PORT=6003
 NODE_IP=xx.xx.xx.xx
 DELEGATE_NAME='osrn'
 DELEGATES=53
+# If a LOCAL_API is not defined, it will default to http://NODE_LOCAL:API_PORT/api
+LOCAL_API='http://127.0.0.1:6003/api'
+NET_API='https://sxp.testnet.sh/api'
+CHAIN_GITHUB='https://api.github.com/repos/Solar-network/core/releases'
 
 ## Network performance thresholds
 LATENCY_THRESHOLD=500
