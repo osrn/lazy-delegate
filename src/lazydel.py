@@ -8,10 +8,10 @@ from util.log import logerr
 from config.config import Config
 from os import path
 from discord_webhook import DiscordWebhook, DiscordEmbed
-import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
+import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json, traceback
 
-__version__     = '0.1'
-__version_info__= tuple([ int(num) for num in __version__.split('.')])
+__version__     = '0.2b'
+__version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
 
@@ -83,7 +83,9 @@ def getProcesses():
             else:
                 tbwpool.setValue('n/a', lambda x: (x != 'online'))
                 logerr('ERROR: pool process unknown to pm2')
-    except:
+    except Exception as e:
+        logerr('ERROR: something seriously went wrong accessing pm2', e)
+        #traceback.print_exc()
         relayproc.setValue('n/a', lambda x: (x != 'online'))
         if (conf.chk_forger): 
             forgerproc.setValue('n/a', lambda x: (x != 'online'))
@@ -91,7 +93,6 @@ def getProcesses():
             tbwcore.setValue('n/a', lambda x: (x != 'online'))
             tbwpay.setValue('n/a', lambda x: (x != 'online'))
             tbwpool.setValue('n/a', lambda x: (x != 'online'))
-        logerr('ERROR: something seriously went wrong accessing pm2')
 
     # TODO: last payment status
 
@@ -103,15 +104,19 @@ def getNetwork():
     global relayHeight, peerSwVersion, networkHeight
 
     # Fetch from Local API
-    try:
-        if (conf.chk_forger):
+    if (conf.chk_forger):
+        try:
             r = requests.get(conf.localapi+'/blockchain')
             if r.status_code == 200:
                 networkHeight = int(r.json()['data']['block']['height'])
             else:
                 networkHeight = 'n/a'
                 logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+        except Exception as e:
+            logerr("ERROR: Exception raised getting local /blockchain", e)
+            #traceback.print_exc()
 
+        try:
             r = requests.get(conf.localapi+'/delegates/'+conf.delegate)
             if r.status_code == 200:
                 nodeRank.value = int(r.json()['data']['rank'])
@@ -120,21 +125,33 @@ def getNetwork():
                 nodeRank.value = 'n/a'
                 lastForged = 'n/a'
                 logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+        except Exception as e:
+            logerr("ERROR: Exception raised getting local /delegates", e)
+            #traceback.print_exc()
+            nodeRank.value = 'n/a'
+            lastForged = 'n/a'
 
-            if (networkHeight == 'n/a' or lastForged == 'n/a'):
-                missedBlocks.value = 'n/a'
-            else:
-                diff = get_round(networkHeight) - get_round(lastForged)
-                missedBlocks.value = diff-1 if diff > 0 else diff
+        if (networkHeight == 'n/a' or lastForged == 'n/a'):
+            missedBlocks.value = 'n/a'
+        else:
+            diff = get_round(networkHeight) - get_round(lastForged)
+            missedBlocks.value = diff-1 if diff > 0 else diff
 
+        try:
             r = requests.get(conf.localapi+'/delegates/'+conf.delegate+'/voters')
             if r.status_code == 200:
                 voters = int(r.json()['meta']['totalCount'])
-                nodeVoters.setValue(voters, lambda x: True if (voters < nodeVoters.prevValue) else False)
+                pv = nodeVoters.prevValue 
+                nodeVoters.setValue(voters, lambda x: True if (voters < (0 if type(pv) == str else pv)) else False)
             else:
                 nodeVoters.setValue('n/a', lambda x: True)
                 logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+        except Exception as e:
+            logerr("ERROR: Exception raised getting local /voters", e)
+            #traceback.print_exc()
+            nodeVoters.setValue('n/a', lambda x: True)
 
+    try:
         r = requests.get(conf.localapi+'/node/syncing')
         if r.status_code == 200:
             relayInSync.setValue(not bool(r.json()['data']['syncing']), lambda x: (not(x)))
@@ -144,13 +161,11 @@ def getNetwork():
             relayInSync.setValue('n/a', lambda x: True)
             relayLag.value = 'n/a'
             logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
-    except:
-        nodeRank.value = 'n/a'
-        missedBlocks.value = 'n/a'
-        nodeVoters.setValue('n/a', lambda x: True)
+    except Exception as e:
+        logerr("ERROR: Exception raised getting local /syncing", e)
+        #traceback.print_exc()
         relayInSync.setValue('n/a', lambda x: True)
         relayLag.value = 'n/a'
-        logerr('ERROR: Cannot reach local API')
 
     # Fetch from Network API
     try:
@@ -162,7 +177,9 @@ def getNetwork():
             nodeLatency.value = 'n/a'
             peerSwVersion = 'n/a'
             logerr('ERROR: Response code %d when accessing network API' % (r.status_code))
-    except:
+    except Exception as e:
+        logerr("ERROR: Exception raised in Network /peers", e)
+        #traceback.print_exc()
         nodeLatency.value = 'n/a'
         peerSwVersion = 'n/a'
 
@@ -176,9 +193,10 @@ def getNetwork():
             lastReleaseVers = '--'
             logerr('ERROR: Response code %d when accessing Last Release in Github' % (r.status_code))
             #lastReleaseDate = 'N/A'
-    except:
+    except Exception as e:
+        logerr("ERROR: Exception raised getting Last Release", e)
+        #traceback.print_exc()
         lastReleaseVers = '--'
-        logerr('ERROR: Cannot reach Github')
 
     nodeSwVersion.setValue(peerSwVersion, lambda x: (x != lastReleaseVers))
 
