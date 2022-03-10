@@ -1,0 +1,40 @@
+##!!! RENAME THIS FILE AS config THEN REVIZE AS FIT
+
+## Host performance thresholds beyond which an alert will be raised
+## Positive values will act as an upper bound where negative values will set a lower bound
+CPU_LOAD_THRESHOLD=60
+MEM_USE_THRESHOLD=70
+SWAP_USE_THRESHOLD=90
+HDD_USE_THRESHOLD=70
+REBOOT_FILE='/var/run/reboot-required'
+
+## Processes
+CHK_FORGER=1
+CHK_TBW=1
+
+## Network definitions
+# Local IP
+NODE_LOCAL=127.0.0.1
+# API server port
+API_PORT=6003
+# Delegate Note (Forger) external IP
+NODE_IP=xx.xx.xx.xx
+DELEGATE_NAME='osrn'
+DELEGATES=53
+# If a LOCAL_API is not defined, it will default to http://NODE_LOCAL:API_PORT/api
+LOCAL_API='http://127.0.0.1:6003/api'
+NET_API='https://sxp.testnet.sh/api'
+CHAIN_GITHUB='https://api.github.com/repos/Solar-network/core/releases'
+
+## Network performance thresholds
+LATENCY_THRESHOLD=500
+# Max allowed block lag for relay node
+MAX_BLOCKS_BEHIND=5
+
+# Probe execution interval in seconds
+PROBE_CYCLE = 120
+# Discord heartbeat interval in seconds
+HEARTBEAT_CYCLE = 3600
+DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'
+DISCORD_ERR='FF0000'
+DISCORD_OK='00FF00'

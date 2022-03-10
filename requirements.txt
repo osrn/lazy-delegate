@@ -1,0 +1,10 @@
+certifi==2021.10.8
+charset-normalizer==2.0.12
+discord-webhook==0.15.0
+idna==3.3
+psutil==5.9.0
+python-dotenv==0.19.2
+pytz==2021.3
+requests==2.27.1
+schedule==1.1.0
+urllib3==1.26.8
