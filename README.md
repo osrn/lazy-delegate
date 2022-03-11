@@ -21,9 +21,11 @@ __**Network status**__
 - Forger rank
 - Delegate voters
 
+<br>
 
 > _Project and most of the probe points were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
 
+<br>
 
 ## Requires
 - Python3
@@ -31,34 +33,85 @@ __**Network status**__
 - Process Manager 2 (pm2)
 - Webhook url associated with a Discord server & channel
 
+<br>
+
 ## Installation
 **install the package via**
 ```bash
 cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh)
 ```
 
+<br>
+
 **next, make sure pm2 is installed**
 
 `npm install pm2@latest -g` or `yarn global add pm2`
 
+<br>
+
 **move on to the configuration**
 > Discord server, channel and webhook creation is accepted as common knowledge hence not mentioned here.
 
+<br>
 
 ## Configuration
-**clone the sample config provided and modify:**
+### clone the sample config provided
 
 `cp src/config/config.example src/config/config`
 
-**Then edit:**
+<br>
 
-`src/config/config`
+### revise src/config/config options
+
+**NODE_IP=xx.xx.xx.xx**
+
+IP address of the forger node to be monitored - as registered in PEER LIST
+
+<br>
+
+**DELEGATE_NAME='xxxx'**
+
+Registered delegate name for the forger node
+
+<br>
+
+**LOCAL_API='http://127.0.0.1:6003/api'**
+
+Default is local node to query API. However, this can be set to any relay node with public API
+
+<br>
+
+**NET_API='https://sxp.testnet.sh/api'**
+
+Best to point to the public API for the network. Yet, it is ok to set to any relay node with public API, or even localhost. Remember to change, when Mainnet.
+
+<br>
+
+**DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'**
+
+Discord hook :)
+
+<br>
+
+**PROBE_CYCLE = 120**
+
+Probe execution (health check) interval in seconds. Value < 60 may suffer from github API rate limiting with a 403 Forbidden response.
+
+<br>
+
+**HEARTBEAT_CYCLE = 3600**
+
+Interval in seconds for heartbeat messages sent to discord.
+
+<br>
 
 ## Run
 start the app and monitor logs
 ```bash
-cd ~/lazy-delegate && pm2 start apps.json && pm2 logs lazy-delegate
+cd ~/lazy-delegate && pm2 start package.json && pm2 logs lazy-delegate
 ```
+
+<br>
 
 to start the app at boot with pm2
 ```bash
@@ -66,16 +119,22 @@ cd && pm2 save
 ```
 *(to start pm2 at boot) do; `pm2 startup` and follow the instructions*
 
+<br>
+
 ### Maintenance
-to start-stop-restart the process on-the-fly:
+to stop|start|restart the process on-the-fly
 ```bash
 pm2 stop|start|restart lazy-delegate
 ```
+
+<br>
 
 Whenever the config file changes, app needs to be restarted
 ```bash
 pm2 restart lazy-delegate
 ```
+
+<br>
 
 to remove the process for whatever reason:
 ```bash
@@ -85,9 +144,11 @@ pm2 delete lazy-delegate
 rm ~/.pm2/logs/lazy-delegate*
 ```
 
+<br>
+
 ## Inside the mind
-Node probed periodically for health checks and any issues raised or cleared after the last check are reported to Discord instantly.
+Node is probed periodically for health checks and any issues raised or cleared during the rest period are reported to Discord instantly. Issues are reported only once, the first time. 
 
-A heartbeat status report, also is issued in (longer) intervals.
+Probe class is responsible for keeping track of the values and governing the alarm raising and clearing logic.
 
-All monitoring points are stored in the Probe class which also governs the alarm raising and clearing logic.
+A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate.

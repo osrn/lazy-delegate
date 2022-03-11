@@ -8,9 +8,10 @@ from util.log import logerr
 from config.config import Config
 from os import path
 from discord_webhook import DiscordWebhook, DiscordEmbed
-import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json, traceback
+import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
+#import traceback
 
-__version__     = '0.2b'
+__version__     = '0.3b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -43,7 +44,6 @@ def findJsonElement(json_obj, key, value):
     return element
 
 def getProcesses():
-    #['pm2_env']['version']
     try:
         pm2status=json.loads(subprocess.run(['pm2','jlist'], capture_output=True, text=True).stdout)
 
@@ -315,6 +315,9 @@ def discordpush(embeds):
 
 
 conf = Config()
+if (conf.error):
+    logerr("FATAL ERROR: config file not found:")
+    quit()
 
 lastboot      = Probe('Last Boot')
 cpuload       = Probe('CPU Load', limit=conf.cpu_load_th)

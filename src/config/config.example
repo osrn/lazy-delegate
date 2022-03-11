@@ -19,7 +19,7 @@ NODE_LOCAL=127.0.0.1
 API_PORT=6003
 # Delegate Note (Forger) external IP
 NODE_IP=xx.xx.xx.xx
-DELEGATE_NAME='osrn'
+DELEGATE_NAME='xxxx'
 DELEGATES=53
 # If a LOCAL_API is not defined, it will default to http://NODE_LOCAL:API_PORT/api
 LOCAL_API='http://127.0.0.1:6003/api'
@@ -32,6 +32,7 @@ LATENCY_THRESHOLD=500
 MAX_BLOCKS_BEHIND=5
 
 # Probe execution interval in seconds
+# value < 60 may suffer from github API rate limiting
 PROBE_CYCLE = 120
 # Discord heartbeat interval in seconds
 HEARTBEAT_CYCLE = 3600

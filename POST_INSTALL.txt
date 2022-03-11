@@ -1,32 +1,31 @@
-=== NEXT STEPS ===
-** make sure pm2 is installed
-npm install pm2@latest -g
-or
-yarn global add pm2
-
-** clone the sample config provided and modify as you see fit
-cp src/config/config.example src/config/config
-edit: src/config/config
-
-** start the app and monitor logs
-cd ~/lazy-delegate && pm2 start apps.json && pm2 logs lazy-delegate
-
-** to start the app at boot with pm2;
-cd && pm2 save
-
-** to start pm2 at boot do; 
-pm2 startup 
-and follow the instructions
-
-=== Maintenance ===
-** to start-stop-restart the process on-the-fly
-pm2 stop|start|restart lazy-delegate
-
-** Whenever the config file changes, app needs to be restarted
-pm2 restart lazy-delegate
-
-*** to remove the process for whatever reason
-pm2 stop lazy-delegate
-pm2 delete lazy-delegate
-# optionally, remove logs
-rm ~/.pm2/logs/lazy-delegate*
+| ** make sure pm2 is installed
+| npm install pm2@latest -g
+| or
+| yarn global add pm2
+| 
+| ** clone the sample config provided and modify as you see fit
+| cp src/config/config.example src/config/config
+| edit: src/config/config
+| 
+| ** start the app and monitor logs
+| cd ~/lazy-delegate && pm2 start package.json && pm2 logs lazy-delegate
+| 
+| ** to start the app at boot with pm2;
+| cd && pm2 save
+| 
+| ** to start pm2 at boot do; 
+| pm2 startup 
+| and follow the instructions
+| 
+| === Maintenance ===
+| ** to start-stop-restart the process on-the-fly
+| pm2 stop|start|restart lazy-delegate
+| 
+| ** Whenever the config file changes, app needs to be restarted
+| pm2 restart lazy-delegate
+| 
+| *** to remove the process for whatever reason
+| pm2 stop lazy-delegate
+| pm2 delete lazy-delegate
+| # optionally, remove logs
+| rm ~/.pm2/logs/lazy-delegate*
