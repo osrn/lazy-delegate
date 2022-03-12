@@ -28,9 +28,7 @@ def getHostStatus():
     lastboot.setValue(lb, lambda x: (os.path.exists(conf.need_reboot)), err='pending restart')
 
     cpuload.value = psutil.cpu_percent()
-    if (cpuload.value > 30): cpuload.notif = 'Test'
     memusage.value = psutil.virtual_memory().percent
-    if (memusage.value > 30): memusage.notif = 'Test1'
     swapusage.value = psutil.swap_memory().percent
     diskusage.value = psutil.disk_usage('/').percent
     '''
