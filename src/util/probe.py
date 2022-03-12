@@ -20,6 +20,9 @@ class Probe():
         self._lastalert = now   # last alert raise time
         self._lastcease = now   # last alert cease time
         self._alertcount = 0    # number of times value out of limits
+        self.alertdesc = ''     # alert supplementary information
+        self.notif = ''         # supplemantary notification message
+        self.notifpending=False
 
     @property
     def isAlert(self):
@@ -72,7 +75,7 @@ class Probe():
                         self._lastcease = datetime.datetime.now()
 
 
-    def setValue(self, newvalue, alarmlogic):
+    def setValue(self, newvalue, alarmlogic, **kwargs):
         """ Set the current value for the probe.
         Compare the new value against the passed function to decide on alert status
         """
@@ -90,8 +93,13 @@ class Probe():
                     if ((self._prev == 'n/a') or (not(alarmlogic(self._prev)))):
                         print('DEBUG: probe %s alarm raised ' % (self.name))
                         self._lastalert = datetime.datetime.now()
+                        self.alertdesc = kwargs.get('err')
+
                 else:
                     if (self._alertcount > 0):
                         print('DEBUG: probe %s alarm ceased ' % (self.name))
                         self._alertcount = 0
                         self._lastcease = datetime.datetime.now()
+
+    def getFmtValue(self, fmtfunc):
+        return fmtfunc(self._now)

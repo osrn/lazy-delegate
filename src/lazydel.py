@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.4b'
+__version__     = '0.4.1a'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -25,10 +25,12 @@ def get_round(height):
 
 def getHostStatus():
     lb = psutil.boot_time()
-    lastboot.setValue(lb, lambda x: (os.path.exists(conf.need_reboot)))
+    lastboot.setValue(lb, lambda x: (os.path.exists(conf.need_reboot)), err='pending restart')
 
     cpuload.value = psutil.cpu_percent()
+    if (cpuload.value > 30): cpuload.notif = 'Test'
     memusage.value = psutil.virtual_memory().percent
+    if (memusage.value > 30): memusage.notif = 'Test1'
     swapusage.value = psutil.swap_memory().percent
     diskusage.value = psutil.disk_usage('/').percent
     '''
@@ -143,6 +145,8 @@ def getNetwork():
                 voters = int(r.json()['meta']['totalCount'])
                 pv = nodeVoters.prevValue 
                 nodeVoters.setValue(voters, lambda x: True if (voters < (0 if type(pv) == str else pv)) else False)
+                if ((type(pv) != str) and (voters > pv)):
+                    nodeVoters.notif = 'You have %d new voter(s)' % (voters - pv)
             else:
                 nodeVoters.setValue('n/a', lambda x: True)
                 logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
@@ -200,6 +204,11 @@ def getNetwork():
 
     nodeSwVersion.setValue(peerSwVersion, lambda x: (x != lastReleaseVers))
 
+
+
+'''
+HEALTH CHECKS
+'''
 def health_checks():
     global lastProbeTime
     lastProbeTime = datetime.datetime.now()
@@ -221,14 +230,19 @@ def health_checks():
     p = lastboot
     if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
         print('DEBUG: raised', p.name)
-        embed1.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' Restart pending!')
+        embed1.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' '+p.alertdesc)
         tEvents += 1
     if (not(p.isAlert) and (p.lastCeaseAt > lastProbeTime)):
         print('DEBUG: ceased', p.name)
-        embed2.add_embed_field(name=p.name, value='Restart pending')
+        embed2.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' '+p.alertdesc)
         tEvents += 1
 
     for p in probes[1:]:
+        if (len(p.notif) > 0):
+            print('DEBUG: notification', p.name)
+            embed0.add_embed_field(name=p.name, value=str(p.notif), inline=True)
+            p.notif = ''
+            tEvents += 1
         if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
             print('DEBUG: raised', p.name)
             embed1.add_embed_field(name=p.name, value=codeblock(p.value))
@@ -254,6 +268,11 @@ def health_checks():
     print('INFO: >>> health check run complete ...', datetime.datetime.now(), end='\n\n')
 
 
+
+
+'''
+HEARTBEAT FACILITY
+'''
 def heartbeat():
     global relayHeight
 
@@ -267,7 +286,8 @@ def heartbeat():
     embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value)+restartNotif)
     tAlert = lastboot.alertCount
     for p in probes[1:5]:
-        embed.add_embed_field(name=p.name, value=str(p.value)+'%')
+        v = codeblock(p.value)+'%' if p.isAlert else str(p.value)+'%'
+        embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
@@ -279,16 +299,19 @@ def heartbeat():
     embed.add_embed_field(name=relayproc.name, value=str(relayproc.value))
     tAlert = relayproc.alertCount
     if (conf.chk_forger):
-        embed.add_embed_field(name=forgerproc.name, value=str(forgerproc.value))
+        v = codeblock(forgerproc.value) if p.isAlert else str(forgerproc.value)
+        embed.add_embed_field(name=forgerproc.name, value=v)
         tAlert += forgerproc.alertCount
 
     if (conf.chk_tbw):
         for p in (tbwcore, tbwpay, tbwpool):
-            embed.add_embed_field(name=p.name, value=str(p.value))
+            v = codeblock(p.value) if p.isAlert else str(p.value)
+            embed.add_embed_field(name=p.name, value=v)
             tAlert += p.alertCount
 
     for p in probes[5:12]:
-        embed.add_embed_field(name=p.name, value=str(p.value))
+        v = codeblock(p.value) if p.isAlert else str(p.value)
+        embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
 
     embed.set_footer(text='Stats by Lazy Delegate')
@@ -314,6 +337,11 @@ def discordpush(embeds):
             logerr('ERROR: Discord webhook failed! Response is: ', response)
 
 
+
+'''
+MAIN
+'''
+print('INFO: >>> starting Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now())))
 conf = Config()
 if (conf.error):
     logerr("FATAL ERROR: config file not found:")
@@ -331,7 +359,7 @@ relayLag      = Probe('Lagging', limit=conf.blocklag_th)
 nodeLatency   = Probe('Latency', limit=conf.latency_th)
 nodeSwVersion = Probe('SW Version', init='')
 nodeRank      = Probe('Rank', limit=conf.delegates)
-nodeVoters    = Probe('Voters')
+nodeVoters    = Probe('Voters', init='--')
 missedBlocks  = Probe('Blockmiss', limit=0)
 probes       += [relayInSync, relayLag, nodeLatency, nodeSwVersion, nodeRank, nodeVoters, missedBlocks]
 
@@ -353,8 +381,6 @@ networkHeight = 0
 peerSwVersion = ''
 
 lastProbeTime = datetime.datetime.now()
-
-print('INFO: >>> starting Lazy Delegate Monitor ...', datetime.datetime.now())
 
 job0 = schedule.every(conf.probe_cycle).seconds.do(health_checks)
 time.sleep(5)

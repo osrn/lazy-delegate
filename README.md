@@ -151,4 +151,12 @@ Node is probed periodically for health checks and any issues raised or cleared d
 
 Probe class is responsible for keeping track of the values and governing the alarm raising and clearing logic.
 
-A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate.
+A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
+
+## Change Log
+**v0.4.1a**
+
+- Values for probes with an active alert are now shown as codeblock in heartbeat status message
+- An info message will be sent to the discord channel if delegate gained any voters during the rest period
+
+
