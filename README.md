@@ -154,7 +154,7 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
-**v0.4.1a**
+**v0.5b**
 
 - Values for probes with an active alert are now shown as codeblock in heartbeat status message
 - An info message will be sent to the discord channel if delegate gained any voters during the rest period
