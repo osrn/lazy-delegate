@@ -37,8 +37,9 @@ __**Network status**__
 
 ## Installation
 **install the package via**
+Replace SUDO_USER with a username with sudo elevation (i.e. having sudo group)
 ```bash
-cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh)
+cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh) SUDO_USER
 ```
 
 <br>
@@ -57,7 +58,7 @@ cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/i
 ## Configuration
 ### clone the sample config provided
 
-`cp src/config/config.example src/config/config`
+`cd ~/lazy-delegate && cp src/config/config.example src/config/config`
 
 <br>
 
@@ -95,7 +96,7 @@ Discord hook :)
 
 **PROBE_CYCLE = 120**
 
-Probe execution (health check) interval in seconds. Value < 60 may suffer from github API rate limiting with a 403 Forbidden response.
+Probe execution (health check) interval in seconds. Notice that a value < 60 may suffer from github API rate limiting with a 403 Forbidden response.
 
 <br>
 
@@ -117,7 +118,12 @@ to start the app at boot with pm2
 ```bash
 cd && pm2 save
 ```
-*(to start pm2 at boot) do; `pm2 startup` and follow the instructions*
+
+to start pm2 at boot;
+
+Option 1) Have sudo privileges? `pm2 startup` and follow the instructions
+
+Option 2) No sudo privileges like solar? `(crontab -l; echo "@reboot /bin/bash -lc \"source /home/solar/.solarrc; pm2 resurrect\"") | sort -u - | crontab -`
 
 <br>
 
@@ -154,6 +160,17 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.51b**
+install.sh
+- non-sudo user friendly installation for required apt packages
+- rewrites CPATH to prevent python package compilation errors (CPATH is restored back afterwards) 
+- Added missing python3-pip APT package to the installation
+- Stop jobs before complete reinstall
+
+documentation
+- how to start pm2 at boot
+<br>
+
 **v0.5b**
 
 - Values for probes with an active alert are now shown as codeblock in heartbeat status message
