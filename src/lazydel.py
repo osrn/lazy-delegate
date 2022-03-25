@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.51b'
+__version__     = '0.52b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -45,7 +45,7 @@ def findJsonElement(json_obj, key, value):
 
 def getProcesses():
     try:
-        pm2status=json.loads(subprocess.run(['pm2','jlist'], capture_output=True, text=True).stdout)
+        pm2status=json.loads(subprocess.run([conf.pm2,'jlist'], capture_output=True, text=True).stdout)
 
         ps=findJsonElement(pm2status, 'name', 'solar-relay')
         if (ps is not None):
@@ -77,6 +77,7 @@ def getProcesses():
                 tbwpay.setValue('n/a', lambda x: (x != 'online'))
                 logerr('ERROR: pay process unknown to pm2')
 
+        if (conf.chk_pool):
             ps=findJsonElement(pm2status, 'name', 'pool')
             if (ps is not None):
                 tbwpool.setValue(ps['pm2_env']['status'], lambda x: (x != 'online'))
@@ -92,6 +93,7 @@ def getProcesses():
         if (conf.chk_tbw):
             tbwcore.setValue('n/a', lambda x: (x != 'online'))
             tbwpay.setValue('n/a', lambda x: (x != 'online'))
+        if (conf.chk_pool):
             tbwpool.setValue('n/a', lambda x: (x != 'online'))
 
     # TODO: last payment status
@@ -297,15 +299,22 @@ def heartbeat():
     embed.add_embed_field(name=relayproc.name, value=str(relayproc.value))
     tAlert = relayproc.alertCount
     if (conf.chk_forger):
-        v = codeblock(forgerproc.value) if p.isAlert else str(forgerproc.value)
-        embed.add_embed_field(name=forgerproc.name, value=v)
-        tAlert += forgerproc.alertCount
+        p = forgerproc
+        v = codeblock(p.value) if p.isAlert else str(p.value)
+        embed.add_embed_field(name=p.name, value=v)
+        tAlert += p.alertCount
 
     if (conf.chk_tbw):
-        for p in (tbwcore, tbwpay, tbwpool):
+        for p in (tbwcore, tbwpay):
             v = codeblock(p.value) if p.isAlert else str(p.value)
             embed.add_embed_field(name=p.name, value=v)
             tAlert += p.alertCount
+
+    if (conf.chk_pool):
+        p = tbwpool
+        v = codeblock(p.value) if p.isAlert else str(p.value)
+        embed.add_embed_field(name=p.name, value=v)
+        tAlert += p.alertCount
 
     for p in probes[5:12]:
         v = codeblock(p.value) if p.isAlert else str(p.value)
@@ -371,8 +380,11 @@ if (conf.chk_forger):
 if (conf.chk_tbw):
     tbwcore   = Probe('TBW Core', init='--')
     tbwpay    = Probe('TBW Pay', init='--')
+    probes   += [tbwcore, tbwpay]
+
+if (conf.chk_pool):
     tbwpool   = Probe('TBW Pool', init='--')
-    probes   += [tbwcore, tbwpay, tbwpool]
+    probes   += [tbwpool]
 
 relayHeight = 0
 networkHeight = 0

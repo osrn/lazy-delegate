@@ -152,7 +152,7 @@ echo '  yarn [global] add pm2'
 echo -e ${NC}
 echo 'First, clone the sample config provided and modify as you see fit'
 echo -e ${CBlue}'  cd '$APPHOME 
-echo '  cp src/config/config.example src/config/config'
+echo '  cp src/config/config.sample src/config/config'
 echo '  (editor) src/config/config'
 echo -e ${NC}'All config parameters are explained in README.md'
 echo 

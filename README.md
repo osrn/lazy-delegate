@@ -23,7 +23,7 @@ __**Network status**__
 
 <br>
 
-> _Project and most of the probe points were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
+> _Project and most of the probes were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
 
 <br>
 
@@ -37,16 +37,10 @@ __**Network status**__
 
 ## Installation
 **install the package via**
-Replace SUDO_USER with a username with sudo elevation (i.e. having sudo group)
+Replace SUDO_USER with a username having sudo rights (i.e. having sudo group)
 ```bash
 cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh) SUDO_USER
 ```
-
-<br>
-
-**next, make sure pm2 is installed**
-
-`npm install pm2@latest -g` or `yarn global add pm2`
 
 <br>
 
@@ -58,11 +52,35 @@ cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/i
 ## Configuration
 ### clone the sample config provided
 
-`cd ~/lazy-delegate && cp src/config/config.example src/config/config`
+`cd ~/lazy-delegate && cp src/config/config.sample src/config/config`
 
 <br>
 
-### revise src/config/config options
+### config options
+
+**PM2='path-to-pm2-executable'**
+
+Path to pm2 executable
+
+<br>
+
+**CHK_FORGER=1**
+
+Enable(1)/disable(0) monitoring PM2 Forger process. Relay process is always checked.
+
+<br>
+
+**CHK_TBW=1**
+
+Enable(1)/disable(0) monitoring PM2 TBW-pool and TBW-pay processes
+
+<br>
+
+**CHK_POOL=1**
+
+Enable(1)/disable(0) monitoring PM2 TBW-pool process
+
+<br>
 
 **NODE_IP=xx.xx.xx.xx**
 
@@ -160,6 +178,12 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.52b**
+- PM2 executable path is now read from the config (solar core 3.2.0-next2 does not export alias to user's shell)
+- TBW-pool process probe now can be enabled/disabled independent of TBW-tbw & TBW-pay probes
+- fixed forger process alert condition test
+<br>
+
 **v0.51b**
 install.sh
 - non-sudo user friendly installation for required apt packages
@@ -177,3 +201,5 @@ documentation
 - An info message will be sent to the discord channel if delegate gained any voters during the rest period
 
 
+## TODO
+- Add probe for Lazy Delegate version

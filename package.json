@@ -2,7 +2,7 @@
     "apps": [{
         "name": "lazy-delegate",
         "description": "Python Solar Node Monitoring with Discord Notification Facility",
-        "version": "0.51b",
+        "version": "0.52b",
         "author": "osrn <osrnnetwork@gmail.com> (https://osrn.github.io)",
         "repository": "https://github.com/osrn/lazy-delegate.git",
         "homepage": "https://github.com/osrn/lazy-delegate",

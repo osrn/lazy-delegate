@@ -9,6 +9,8 @@ class Config():
         if (len(config) == 0): 
             self.error = True
         else:
+            self.pm2 = config.get('PM2','/home/solar/.solar/.pnpm/bin/pm2')
+
             self.error = False
             self.cpu_load_th = float(config.get('CPU_LOAD_THRESHOLD','50'))
             self.mem_use_th  = float(config.get('MEM_USE_THRESHOLD','80'))
@@ -18,6 +20,7 @@ class Config():
 
             self.chk_forger  = bool(int(config.get('CHK_FORGER', 1)))
             self.chk_tbw     = bool(int(config.get('CHK_TBW', 1)))
+            self.chk_pool    = bool(int(config.get('CHK_POOL', 1)))
 
             self.nodelocal   = config.get('NODE_LOCAL','127.0.0.1')
             self.nodeip      = config.get('NODE_IP','127.0.0.1')

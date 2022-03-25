@@ -1,4 +1,7 @@
-##!!! RENAME THIS FILE AS config THEN REVIZE AS FIT
+##!!! SAMPLE.CONFIG. CLONE AS config
+
+## PM2 PATH
+PM2='/home/solar/.solar/.pnpm/bin/pm2'
 
 ## Host performance thresholds beyond which an alert will be raised
 ## Positive values will act as an upper bound where negative values will set a lower bound
@@ -11,6 +14,7 @@ REBOOT_FILE='/var/run/reboot-required'
 ## Processes
 CHK_FORGER=1
 CHK_TBW=1
+CHK_POOL=1
 
 ## Network definitions
 # Local IP
