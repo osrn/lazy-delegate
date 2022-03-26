@@ -1,6 +1,6 @@
 # Config
 src/config/config
-src/config/config.mainnet
+src/config/config.mainnet*
 src/config/config.testnet
 
 # Dev environment

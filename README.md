@@ -177,6 +177,10 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.54b**
+- fix: error in last block produced check before epoch
+<br>
+
 **v0.53b**
 - fix: rank, voters and missed blocks should not be reported if CHK_FORGER=0
 - minor doc changes

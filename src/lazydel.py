@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.53b'
+__version__     = '0.54b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -122,7 +122,7 @@ def getNetwork():
             r = requests.get(conf.localapi+'/delegates/'+conf.delegate)
             if r.status_code == 200:
                 nodeRank.value = int(r.json()['data']['rank'])
-                lastForged = int(r.json()['data']['blocks']['last']['height'])
+                lastForged = int(r.json()['data']['blocks']['last']['height']) if (int(r.json()['data']['blocks']['produced']) > 0) else 0
             else:
                 nodeRank.value = 'n/a'
                 lastForged = 'n/a'
