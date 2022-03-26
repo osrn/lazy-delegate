@@ -1,4 +1,5 @@
-##!!! SAMPLE.CONFIG. CLONE AS config
+##!!! SAMPLE CONFIGURATION FILE !!!
+## Clone and save as filename: config
 
 ## PM2 PATH
 PM2='/home/solar/.solar/.pnpm/bin/pm2'
@@ -27,7 +28,8 @@ DELEGATE_NAME='xxxx'
 DELEGATES=53
 # If a LOCAL_API is not defined, it will default to http://NODE_LOCAL:API_PORT/api
 LOCAL_API='http://127.0.0.1:6003/api'
-NET_API='https://sxp.testnet.sh/api'
+NET_API='https://sxp.mainnet.sh/api'
+#NET_API='https://sxp.testnet.sh/api'
 CHAIN_GITHUB='https://api.github.com/repos/Solar-network/core/releases'
 
 ## Network performance thresholds

@@ -13,7 +13,7 @@ __**Node processes**__
 - SW Version
 - Solar Relay
 - Solar Forger
-- [True Block Weight](https://github.com/galperins4/core2_tbw) _by Solar Delegate Goose @galperins4_
+- [True Block Weight](https://github.com/osrn/core2_tbw) _forked from [original](https://github.com/galperins4/core2_tbw) by Solar Delegate Goose @galperins4_
 
 __**Network status**__
 - Relay sync status and lag
@@ -36,8 +36,7 @@ __**Network status**__
 <br>
 
 ## Installation
-**install the package via**
-Replace SUDO_USER with a username having sudo rights (i.e. having sudo group)
+Replace SUDO_USER with a username having sudo rights (i.e. having sudo group) and run command below
 ```bash
 cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh) SUDO_USER
 ```
@@ -45,7 +44,7 @@ cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/i
 <br>
 
 **move on to the configuration**
-> Discord server, channel and webhook creation is accepted as common knowledge hence not mentioned here.
+> Discord channel webhook creation is common knowledge hence not mentioned here.
 
 <br>
 
@@ -100,7 +99,7 @@ Default is local node to query API. However, this can be set to any relay node w
 
 <br>
 
-**NET_API='https://sxp.testnet.sh/api'**
+**NET_API='https://sxp.mainnet.sh/api'**
 
 Best to point to the public API for the network. Yet, it is ok to set to any relay node with public API, or even localhost. Remember to change, when Mainnet.
 
@@ -178,6 +177,11 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.53b**
+- fix: rank, voters and missed blocks should not be reported if CHK_FORGER=0
+- minor doc changes
+<br>
+
 **v0.52b**
 - PM2 executable path is now read from the config (solar core 3.2.0-next2 does not export alias to user's shell)
 - TBW-pool process probe now can be enabled/disabled independent of TBW-tbw & TBW-pay probes

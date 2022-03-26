@@ -153,7 +153,7 @@ echo -e ${NC}
 echo 'First, clone the sample config provided and modify as you see fit'
 echo -e ${CBlue}'  cd '$APPHOME 
 echo '  cp src/config/config.sample src/config/config'
-echo '  (editor) src/config/config'
+echo '  (edit) src/config/config'
 echo -e ${NC}'All config parameters are explained in README.md'
 echo 
 echo 'Next do;' 
@@ -168,6 +168,6 @@ echo 'opt 1/ user with sudo privilege'
 echo -e ${CBlue}'  pm2 startup'
 echo -e ${NC}'and follow the instructions'
 echo
-echo 'opt 2/ user like solar with no sudo privilege'
-echo -e ${CBlue}'  (crontab -l; echo "@reboot /bin/bash -lc \"source /home/solar/.solarrc; pm2 resurrect\"") | sort -u - | crontab -'
+echo 'opt 2/ user like solar with no sudo privilege - NOTE: this is already done by solar core > 3.2.0 install'
+echo -e ${CBlue}'  @reboot /bin/bash -lc "source /home/solar/.solar/.env; /home/solar/.solar/.pnpm/bin/pm2 resurrect"'
 echo -e ${NC}

@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.52b'
+__version__     = '0.53b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -279,12 +279,14 @@ def heartbeat():
     print('INFO: >>> starting heartbeat ...', datetime.datetime.now())
     embeds = []
 
+    # Insert node stats
     embed = DiscordEmbed()
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node stats**__")
     restartNotif = ' Restart pending!' if lastboot.isAlert else ''
     embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value)+restartNotif)
     tAlert = lastboot.alertCount
+
     for p in probes[1:5]:
         v = codeblock(p.value)+'%' if p.isAlert else str(p.value)+'%'
         embed.add_embed_field(name=p.name, value=v)
@@ -293,16 +295,23 @@ def heartbeat():
     embed.set_color(ecolor)
     embeds.append(embed)
 
+    # Insert network stats
     embed = DiscordEmbed()
     embed.set_title("__**Network stats**__")
-    
+
     embed.add_embed_field(name=relayproc.name, value=str(relayproc.value))
     tAlert = relayproc.alertCount
-    if (conf.chk_forger):
-        p = forgerproc
+
+    for p in probes[5:9]:
         v = codeblock(p.value) if p.isAlert else str(p.value)
         embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
+
+    if (conf.chk_forger):
+        for p in (forgerproc, nodeRank, nodeVoters, missedBlocks):
+            v = codeblock(p.value) if p.isAlert else str(p.value)
+            embed.add_embed_field(name=p.name, value=v)
+            tAlert += p.alertCount
 
     if (conf.chk_tbw):
         for p in (tbwcore, tbwpay):
@@ -312,11 +321,6 @@ def heartbeat():
 
     if (conf.chk_pool):
         p = tbwpool
-        v = codeblock(p.value) if p.isAlert else str(p.value)
-        embed.add_embed_field(name=p.name, value=v)
-        tAlert += p.alertCount
-
-    for p in probes[5:12]:
         v = codeblock(p.value) if p.isAlert else str(p.value)
         embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
@@ -365,17 +369,17 @@ relayInSync   = Probe('Synced', init=True)
 relayLag      = Probe('Lagging', limit=conf.blocklag_th)
 nodeLatency   = Probe('Latency', limit=conf.latency_th)
 nodeSwVersion = Probe('SW Version', init='')
-nodeRank      = Probe('Rank', limit=conf.delegates)
-nodeVoters    = Probe('Voters', init='--')
-missedBlocks  = Probe('Blockmiss', limit=0)
-probes       += [relayInSync, relayLag, nodeLatency, nodeSwVersion, nodeRank, nodeVoters, missedBlocks]
+probes       += [relayInSync, relayLag, nodeLatency, nodeSwVersion]
 
 relayproc     = Probe('Relay proc', init='--')
 probes       += [relayproc]
 
 if (conf.chk_forger):
-    forgerproc= Probe('Forger proc', init='--')
-    probes   += [forgerproc]
+    forgerproc  = Probe('Forger proc', init='--')
+    nodeRank    = Probe('Rank', limit=conf.delegates)
+    nodeVoters  = Probe('Voters', init='--')
+    missedBlocks= Probe('Blockmiss', limit=0)
+    probes     += [forgerproc, nodeRank, nodeVoters, missedBlocks]
 
 if (conf.chk_tbw):
     tbwcore   = Probe('TBW Core', init='--')
