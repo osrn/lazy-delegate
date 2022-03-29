@@ -25,6 +25,8 @@ __**Network status**__
 
 > _Project and most of the probes were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
 
+Discord messages are colored in parallel with alert status and the probes causing alert are displayed in bold and code style with colored background.
+
 <br>
 
 ## Requires
@@ -38,7 +40,7 @@ __**Network status**__
 ## Installation
 Replace SUDO_USER with a username having sudo rights (i.e. having sudo group) and run command below
 ```bash
-cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh) SUDO_USER
+cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/develop/install.sh) SUDO_USER
 ```
 
 <br>
@@ -105,21 +107,33 @@ Best to point to the public API for the network. Yet, it is ok to set to any rel
 
 <br>
 
-**DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'**
-
-Discord hook :)
-
-<br>
-
 **PROBE_CYCLE = 120**
 
 Probe execution (health check) interval in seconds. Notice that a value < 60 may suffer from github API rate limiting with a 403 Forbidden response.
 
 <br>
 
+**DEBUG = 0**
+
+Set to 1 for verbose logging
+
+<br>
+
 **HEARTBEAT_CYCLE = 3600**
 
 Interval in seconds for heartbeat messages sent to discord.
+
+<br>
+
+**DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'**
+
+Discord hook :)
+
+<br>
+
+**DISCORD_USER='user'**
+
+Discord user to notify with @mention for alert messages
 
 <br>
 

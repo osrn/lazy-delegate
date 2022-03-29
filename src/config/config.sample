@@ -40,8 +40,11 @@ MAX_BLOCKS_BEHIND=5
 # Probe execution interval in seconds
 # value < 60 may suffer from github API rate limiting
 PROBE_CYCLE = 120
+DEBUG = 0
+
 # Discord heartbeat interval in seconds
 HEARTBEAT_CYCLE = 3600
 DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'
 DISCORD_ERR='FF0000'
 DISCORD_OK='00FF00'
+DISCORD_USER='user'

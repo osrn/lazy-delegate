@@ -4,7 +4,7 @@
    reporting via Discord.
 """
 from util.probe import Probe
-from util.log import logerr
+from util.log import logerr, logdbg
 from config.config import Config
 from os import path
 from discord_webhook import DiscordWebhook, DiscordEmbed
@@ -100,7 +100,7 @@ def getProcesses():
 
 
 def codeblock(text):
-    return '`'+str(text)+'`'
+    return '**`'+str(text)+'`**'
 
 def getNetwork():
     global relayHeight, peerSwVersion, networkHeight
@@ -218,9 +218,9 @@ def health_checks():
     getProcesses()
     getNetwork()
 
-    print('DEBUG:', 'name', 'value', 'threshold', 'isAlert', 'alertCount', 'lastAlert', sep='|')
+    logdbg('name', 'value', 'threshold', 'isAlert', 'alertCount', 'lastAlert', sep='|')
     for p in probes:
-        print('DEBUG:', p.name, p.value, p.th, p.isAlert, p.alertCount, p.lastAlertAt, sep='|')
+        logdbg(p.name, p.value, p.th, p.isAlert, p.alertCount, p.lastAlertAt, sep='|')
 
     embed0 = DiscordEmbed()
     embed1 = DiscordEmbed()
@@ -229,33 +229,34 @@ def health_checks():
 
     p = lastboot
     if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
-        print('DEBUG: raised', p.name)
+        logdbg('raised', p.name)
         embed1.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' '+p.alertdesc)
         tEvents += 1
     if (not(p.isAlert) and (p.lastCeaseAt > lastProbeTime)):
-        print('DEBUG: ceased', p.name)
+        logdbg('ceased', p.name)
         embed2.add_embed_field(name=p.name, value=codeblock(getUtcTimeStr(p.value))+' '+p.alertdesc)
         tEvents += 1
 
     for p in probes[1:]:
         if (len(p.notif) > 0):
-            print('DEBUG: notification', p.name)
+            logdbg('notification', p.name)
             embed0.add_embed_field(name=p.name, value=str(p.notif), inline=True)
             p.notif = ''
             tEvents += 1
         if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
-            print('DEBUG: raised', p.name)
+            logdbg('raised', p.name)
             embed1.add_embed_field(name=p.name, value=codeblock(p.value))
             tEvents += 1
         if (not(p.isAlert) and (p.lastCeaseAt > lastProbeTime)):
-            print('DEBUG: ceased', p.name)
+            logdbg('ceased', p.name)
             embed2.add_embed_field(name=p.name, value=codeblock(p.value))
             tEvents += 1
 
     if tEvents > 0:
-        embed0.set_author(name='DELEGATE '+conf.delegate.upper()+" Alert Status changed")
+        embed0.set_author(name='DELEGATE '+conf.delegate.upper()+" Alert Status changed")    
         embeds=[embed0]
         if len(embed1.get_embed_fields()) > 0:
+            embed0.set_description('Warning @{0}, you have {1} new alerts :warning:'.format(conf.discorduser, len(embed1.get_embed_fields())))
             embed1.set_title("Issues open:")
             embed1.set_color(conf.discord_err_color)
             embeds.append(embed1)
@@ -278,22 +279,29 @@ def heartbeat():
 
     print('INFO: >>> starting heartbeat ...', datetime.datetime.now())
     embeds = []
-
+    totAlerts = 0
     # Insert node stats
     embed = DiscordEmbed()
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node stats**__")
-    restartNotif = ' Restart pending!' if lastboot.isAlert else ''
-    embed.set_description('Last boot: ' + getUtcTimeStr(lastboot.value)+restartNotif)
-    tAlert = lastboot.alertCount
+
+    tAlert = 0
 
     for p in probes[1:5]:
         v = codeblock(p.value)+'%' if p.isAlert else str(p.value)+'%'
         embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
+
+    p = lastboot
+    v = codeblock(getUtcTimeStr(p.value)+ ' *') if p.isAlert else str(getUtcTimeStr(p.value))
+    embed.add_embed_field(name=p.name, value=v)
+    tAlert += p.alertCount
+
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
     embeds.append(embed)
+
+    totAlerts = tAlert
 
     # Insert network stats
     embed = DiscordEmbed()
@@ -325,13 +333,16 @@ def heartbeat():
         embed.add_embed_field(name=p.name, value=v)
         tAlert += p.alertCount
 
+    totAlerts += tAlert
+
     embed.set_footer(text='Stats by Lazy Delegate')
     embed.set_timestamp()
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
     embeds.append(embed)
 
-    print('DEBUG: sending discord message ...')
+    embeds[0].set_description('Warning @{0}, you have {1} alerts :warning:'.format(conf.discorduser, totAlerts)) if (totAlerts > 0) else 'All systems check :ok:'
+    logdbg('sending discord message ...')
     discordpush(embeds)
     print('INFO: >>> heartbeat run complete ...', datetime.datetime.now())
 

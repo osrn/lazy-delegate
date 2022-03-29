@@ -10,6 +10,7 @@ class Config():
             self.error = True
         else:
             self.pm2 = config.get('PM2','/home/solar/.solar/.pnpm/bin/pm2')
+            self.debug = bool(int(config.get('DEBUG', 0)))
 
             self.error = False
             self.cpu_load_th = float(config.get('CPU_LOAD_THRESHOLD','50'))
@@ -40,3 +41,4 @@ class Config():
             self.discordhook = config.get('DISCORD_HOOK', None)
             self.discord_err_color = config.get('DISCORD_ERR', 'FF0000')
             self.discord_oki_color = config.get('DISCORD_OK', '00FF00')
+            self.discorduser = config.get('DISCORD_USER', '')

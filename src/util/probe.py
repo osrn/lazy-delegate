@@ -1,4 +1,4 @@
-from .log import logerr
+from .log import logerr, logdbg
 import datetime
 
 class Probe():
@@ -59,18 +59,18 @@ class Probe():
         if (self._now != self._prev):
             if (self._now == 'n/a'):
                 self._alertcount += 1
-                print('DEBUG: probe %s alarm raised ' % (self.name))
+                logdbg('probe %s alarm raised ' % (self.name))
                 self._lastalert = datetime.datetime.now()
             else:
                 sign = 1 if self.th == 0 else self.th / abs(self.th)
                 if ((self.th is not None) and (sign * self._now > self.th)):
                     self._alertcount += 1
                     if ((self._prev == 'n/a') or (sign * self._prev <= self.th)):
-                        print('DEBUG: probe %s alarm raised ' % (self.name))
+                        logdbg('probe %s alarm raised ' % (self.name))
                         self._lastalert = datetime.datetime.now()
                 else:
                     if (self._alertcount > 0):
-                        print('DEBUG: probe %s alarm ceased ' % (self.name))
+                        logdbg('probe %s alarm ceased ' % (self.name))
                         self._alertcount = 0
                         self._lastcease = datetime.datetime.now()
 
@@ -85,19 +85,19 @@ class Probe():
         if (self._now != self._prev):
             if (self._now == 'n/a'):
                 self._alertcount += 1
-                print('DEBUG: probe %s alarm raised ' % (self.name))
+                logdbg('probe %s alarm raised ' % (self.name))
                 self._lastalert = datetime.datetime.now()
             else:
                 if (alarmlogic(self._now)):
                     self._alertcount += 1
                     if ((self._prev == 'n/a') or (not(alarmlogic(self._prev)))):
-                        print('DEBUG: probe %s alarm raised ' % (self.name))
+                        logdbg('probe %s alarm raised ' % (self.name))
                         self._lastalert = datetime.datetime.now()
                         self.alertdesc = kwargs.get('err')
 
                 else:
                     if (self._alertcount > 0):
-                        print('DEBUG: probe %s alarm ceased ' % (self.name))
+                        logdbg('probe %s alarm ceased ' % (self.name))
                         self._alertcount = 0
                         self._lastcease = datetime.datetime.now()
 
