@@ -39,10 +39,29 @@ Discord embed side colors indicate alert status and the probes causing alert are
 
 <br>
 
+## Update instructions for 0.55b
+```bash
+pm2 stop lazy-delegate
+cd ~/lazy-delegate/ && git pull
+. .venv/bin/activate
+pip3 install -r requirements.txt && deactivate
+```
+
+add the following in `~/lazy-delegate/src/config/config`
+```text
+DEBUG=0
+DISCORD_USER='<@your_userid_not_bots>'
+```
+
+start and check logs
+```bash
+pm2 start lazy-delegate && pm2 logs lazy-delegate
+```
+
 ## Installation
 Replace SUDO_USER with a username having sudo rights (i.e. having sudo group) and run command below
 ```bash
-cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/develop/install.sh) SUDO_USER
+cd && bash <(curl -s https://raw.githubusercontent.com/osrn/lazy-delegate/main/install.sh) SUDO_USER
 ```
 
 <br>
@@ -193,6 +212,14 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.55b**
+
+better notification for alert conditions
+- mention user in alert condition message to receive notification
+- better visibility for probes causing alert condition in heartbeat
+- turn on/off verbose logging via config. colored output for debug messages
+<br>
+
 **v0.54b**
 - fix: error in last block produced check before epoch
 <br>

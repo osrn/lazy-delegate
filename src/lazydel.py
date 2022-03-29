@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.54b'
+__version__     = '0.55b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"

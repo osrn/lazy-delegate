@@ -5,7 +5,7 @@ APPNAME="lazy-delegate"
 APPHOME="$HOME/$APPNAME"
 VENV="$APPHOME/.venv"
 GITREPO="https://github.com/$AUTHOR/$APPNAME.git"
-GITBRANCH="develop"
+GITBRANCH="main"
 
 # Regular Colors
 CBlack='\033[0;30m'  # Black
