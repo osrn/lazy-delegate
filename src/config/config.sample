@@ -47,4 +47,4 @@ HEARTBEAT_CYCLE = 3600
 DISCORD_HOOK='https://discord.com/api/webhooks/xxxxx/yyyyyyyyyy'
 DISCORD_ERR='FF0000'
 DISCORD_OK='00FF00'
-DISCORD_USER='<@userid>'
+DISCORD_USER='your_userid_not_bots'

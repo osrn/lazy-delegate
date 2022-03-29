@@ -23,9 +23,11 @@ __**Network status**__
 
 <br>
 
-> _Project and most of the probes were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
+Discord embed side colors indicate alert status and the probes causing alert are displayed as __**``bold underlined code style``**__.
 
-Discord messages are colored in parallel with alert status and the probes causing alert are displayed in bold and code style with colored background.
+<br>
+
+> _Project and most of the probes were inspired by Solar Delegate @mtaylan 's [Solar Node Monitoring scripts](https://github.com/mtaylan/SOLAR_NODE_Monitor_Discord)_
 
 <br>
 
@@ -131,9 +133,9 @@ Discord hook :)
 
 <br>
 
-**DISCORD_USER='<@userid>'**
+**DISCORD_USER='your_userid_not_bots'**
 
-Discord user to notify with @mention for alert messages
+Userid of the discord user to notify with a @mention for alert situation. User will not be mentioned if no alert or alert ceased.
 
 <br>
 

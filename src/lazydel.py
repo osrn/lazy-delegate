@@ -354,7 +354,7 @@ def discordpush(embeds, alert=False, alerts=0):
     if conf.discordhook is not None:
         webhook = DiscordWebhook(url=conf.discordhook)
         if alert:
-            webhook.set_content(':warning: Warning {0}, you have {1} probe alerts'.format(conf.discorduser, alerts))
+            webhook.set_content('Warning <@{0}>, you have {1} probe alerts :warning:'.format(conf.discorduser, alerts))
 
         for e in embeds:
             webhook.add_embed(e)

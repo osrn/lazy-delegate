@@ -1,11 +1,12 @@
 # Config
-src/config/config
-src/config/config.mainnet*
-src/config/config.testnet
+src/config/config*
+!src/config/config.py
+!src/config/config.sample
 
 # Dev environment
 *.code-workspace
 **/__pycache__/
+README-alphavers.md
 
 # Virtual environment
 .venv
