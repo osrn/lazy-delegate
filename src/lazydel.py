@@ -100,7 +100,8 @@ def getProcesses():
 
 
 def codeblock(text):
-    return '**`'+str(text)+'`**'
+    #~~__***`ttt`***__~~
+    return '__**`'+str(text)+'`**__'
 
 def getNetwork():
     global relayHeight, peerSwVersion, networkHeight
@@ -253,18 +254,19 @@ def health_checks():
             tEvents += 1
 
     if tEvents > 0:
-        embed0.set_author(name='DELEGATE '+conf.delegate.upper()+" Alert Status changed")    
+        tShouldAlert = False
+        embed0.set_title('DELEGATE '+conf.delegate.upper()+" ALERT STATUS")
         embeds=[embed0]
         if len(embed1.get_embed_fields()) > 0:
-            embed0.set_description('Warning @{0}, you have {1} new alerts :warning:'.format(conf.discorduser, len(embed1.get_embed_fields())))
             embed1.set_title("Issues open:")
             embed1.set_color(conf.discord_err_color)
             embeds.append(embed1)
+            tShouldAlert = True
         if len(embed2.get_embed_fields()) > 0:
             embed2.set_title("Issues cleared:")
             embed2.set_color(conf.discord_oki_color)
             embeds.append(embed2)
-        discordpush(embeds)
+        discordpush(embeds,tShouldAlert,alerts=len(embed1.get_embed_fields()))
 
     print('INFO: >>> health check run complete ...', datetime.datetime.now(), end='\n\n')
 
@@ -341,15 +343,19 @@ def heartbeat():
     embed.set_color(ecolor)
     embeds.append(embed)
 
-    embeds[0].set_description('Warning @{0}, you have {1} alerts :warning:'.format(conf.discorduser, totAlerts)) if (totAlerts > 0) else 'All systems check :ok:'
+    if (totAlerts == 0): embeds[0].set_description('All systems check :ok:')
+
     logdbg('sending discord message ...')
-    discordpush(embeds)
+    discordpush(embeds, (totAlerts > 0), totAlerts)
     print('INFO: >>> heartbeat run complete ...', datetime.datetime.now())
 
 
-def discordpush(embeds):
+def discordpush(embeds, alert=False, alerts=0):
     if conf.discordhook is not None:
         webhook = DiscordWebhook(url=conf.discordhook)
+        if alert:
+            webhook.set_content(':warning: Warning {0}, you have {1} probe alerts'.format(conf.discorduser, alerts))
+
         for e in embeds:
             webhook.add_embed(e)
 

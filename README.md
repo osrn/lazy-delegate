@@ -131,7 +131,7 @@ Discord hook :)
 
 <br>
 
-**DISCORD_USER='user'**
+**DISCORD_USER='<@userid>'**
 
 Discord user to notify with @mention for alert messages
 
