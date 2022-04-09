@@ -212,6 +212,15 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.56b**
+
+notification and alert improvements
+- notification when rank changes
+- notification when voter count changes
+- voter count change is not an alert reason in heartbeat anymore
+- notification now includes a footer with timestamp
+<br>
+
 **v0.55b**
 
 better notification for alert conditions

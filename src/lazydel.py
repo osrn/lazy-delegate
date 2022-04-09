@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
 #import traceback
 
-__version__     = '0.55b'
+__version__     = '0.56b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -124,6 +124,14 @@ def getNetwork():
             if r.status_code == 200:
                 nodeRank.value = int(r.json()['data']['rank'])
                 lastForged = int(r.json()['data']['blocks']['last']['height']) if (int(r.json()['data']['blocks']['produced']) > 0) else 0
+
+                if (nodeRank.value == nodeRank.prevValue):
+                    nodeRank.notif = ''
+                else:
+                    nodeRank.notif = 'Rank changed by %s from %d to %d' % \
+                        ('inf' if (type(nodeRank.prevValue) == str) else abs(nodeRank.value - nodeRank.prevValue), \
+                        nodeRank.prevValue, \
+                        nodeRank.value)
             else:
                 nodeRank.value = 'n/a'
                 lastForged = 'n/a'
@@ -148,6 +156,10 @@ def getNetwork():
                 nodeVoters.setValue(voters, lambda x: True if (voters < (0 if type(pv) == str else pv)) else False)
                 if ((type(pv) != str) and (voters > pv)):
                     nodeVoters.notif = 'You have %d new voter(s)' % (voters - pv)
+                elif ((type(pv) != str) and (voters < pv)):
+                    nodeVoters.notif = 'You have %d less voter(s)' % (pv - voters)
+                else:
+                    nodeVoters.notif = ''
             else:
                 nodeVoters.setValue('n/a', lambda x: True)
                 logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
@@ -241,7 +253,7 @@ def health_checks():
     for p in probes[1:]:
         if (len(p.notif) > 0):
             logdbg('notification', p.name)
-            embed0.add_embed_field(name=p.name, value=str(p.notif), inline=True)
+            embed0.add_embed_field(name=p.name, value=str(p.notif), inline=False)
             p.notif = ''
             tEvents += 1
         if (p.isAlert and (p.lastAlertAt > lastProbeTime)):
@@ -255,17 +267,29 @@ def health_checks():
 
     if tEvents > 0:
         tShouldAlert = False
-        embed0.set_title('DELEGATE '+conf.delegate.upper()+" ALERT STATUS")
-        embeds=[embed0]
+        embed_for_header = None
+        if len(embed0.get_embed_fields()) > 0:
+            embeds=[embed0]
+            embed_for_header=embed0
+            embed_for_footer=embed0
         if len(embed1.get_embed_fields()) > 0:
+            if embed_for_header is None: embed_for_header=embed1
             embed1.set_title("Issues open:")
             embed1.set_color(conf.discord_err_color)
             embeds.append(embed1)
+            embed_for_footer=embed1
             tShouldAlert = True
         if len(embed2.get_embed_fields()) > 0:
+            if embed_for_header is None: embed_for_header=embed2
             embed2.set_title("Issues cleared:")
             embed2.set_color(conf.discord_oki_color)
             embeds.append(embed2)
+            embed_for_footer=embed2
+
+        embed_for_header.set_author(name='DELEGATE '+conf.delegate.upper()+" NOTIFICATION")
+        embed_for_footer.set_footer(text='Notifs by Lazy Delegate')
+        embed_for_footer.set_timestamp()
+        
         discordpush(embeds,tShouldAlert,alerts=len(embed1.get_embed_fields()))
 
     print('INFO: >>> health check run complete ...', datetime.datetime.now(), end='\n\n')
@@ -282,7 +306,7 @@ def heartbeat():
     print('INFO: >>> starting heartbeat ...', datetime.datetime.now())
     embeds = []
     totAlerts = 0
-    # Insert node stats
+    # Embed 0: Insert node stats
     embed = DiscordEmbed()
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" HEARTBEAT")
     embed.set_title("__**Node stats**__")
@@ -297,7 +321,7 @@ def heartbeat():
     p = lastboot
     v = codeblock(getUtcTimeStr(p.value)+ ' *') if p.isAlert else str(getUtcTimeStr(p.value))
     embed.add_embed_field(name=p.name, value=v)
-    tAlert += p.alertCount
+    tAlert += 1 if p.alertCount > 0 else 0
 
     ecolor=conf.discord_err_color if (tAlert > 0) else conf.discord_oki_color
     embed.set_color(ecolor)
@@ -305,35 +329,38 @@ def heartbeat():
 
     totAlerts = tAlert
 
-    # Insert network stats
+    # Embed 1: Insert network stats
     embed = DiscordEmbed()
     embed.set_title("__**Network stats**__")
 
     embed.add_embed_field(name=relayproc.name, value=str(relayproc.value))
-    tAlert = relayproc.alertCount
+    tAlert = 1 if relayproc.alertCount > 0 else 0
 
     for p in probes[5:9]:
         v = codeblock(p.value) if p.isAlert else str(p.value)
         embed.add_embed_field(name=p.name, value=v)
-        tAlert += p.alertCount
+        tAlert += 1 if p.alertCount > 0 else 0
 
     if (conf.chk_forger):
-        for p in (forgerproc, nodeRank, nodeVoters, missedBlocks):
+        for p in (forgerproc, nodeRank, missedBlocks):
             v = codeblock(p.value) if p.isAlert else str(p.value)
             embed.add_embed_field(name=p.name, value=v)
-            tAlert += p.alertCount
+            tAlert += 1 if p.alertCount > 0 else 0
+        
+        # no alert for voter change
+        embed.add_embed_field(name=nodeVoters.name, value=str(nodeVoters.value))
 
     if (conf.chk_tbw):
         for p in (tbwcore, tbwpay):
             v = codeblock(p.value) if p.isAlert else str(p.value)
             embed.add_embed_field(name=p.name, value=v)
-            tAlert += p.alertCount
+            tAlert += 1 if p.alertCount > 0 else 0
 
     if (conf.chk_pool):
         p = tbwpool
         v = codeblock(p.value) if p.isAlert else str(p.value)
         embed.add_embed_field(name=p.name, value=v)
-        tAlert += p.alertCount
+        tAlert += 1 if p.alertCount > 0 else 0
 
     totAlerts += tAlert
 
@@ -354,7 +381,7 @@ def discordpush(embeds, alert=False, alerts=0):
     if conf.discordhook is not None:
         webhook = DiscordWebhook(url=conf.discordhook)
         if alert:
-            webhook.set_content('Warning <@{0}>, you have {1} probe alerts :warning:'.format(conf.discorduser, alerts))
+            webhook.set_content('Warning! you have {1} probe alerts <@{0}> :warning:'.format(conf.discorduser, alerts))
 
         for e in embeds:
             webhook.add_embed(e)
@@ -394,9 +421,9 @@ probes       += [relayproc]
 if (conf.chk_forger):
     forgerproc  = Probe('Forger proc', init='--')
     nodeRank    = Probe('Rank', limit=conf.delegates)
-    nodeVoters  = Probe('Voters', init='--')
     missedBlocks= Probe('Blockmiss', limit=0)
-    probes     += [forgerproc, nodeRank, nodeVoters, missedBlocks]
+    nodeVoters  = Probe('Voters', init='--')
+    probes     += [forgerproc, nodeRank, missedBlocks, nodeVoters]
 
 if (conf.chk_tbw):
     tbwcore   = Probe('TBW Core', init='--')
