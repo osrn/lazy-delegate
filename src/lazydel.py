@@ -268,8 +268,9 @@ def health_checks():
     if tEvents > 0:
         tShouldAlert = False
         embed_for_header = None
+        embeds=[]
         if len(embed0.get_embed_fields()) > 0:
-            embeds=[embed0]
+            embeds.append(embed0)
             embed_for_header=embed0
             embed_for_footer=embed0
         if len(embed1.get_embed_fields()) > 0:
