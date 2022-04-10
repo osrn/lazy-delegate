@@ -8,10 +8,10 @@ from util.log import logerr, logdbg
 from config.config import Config
 from os import path
 from discord_webhook import DiscordWebhook, DiscordEmbed
-import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json
+import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json, signal, sys
 #import traceback
 
-__version__     = '0.56b'
+__version__     = '0.6b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -114,7 +114,7 @@ def getNetwork():
                 networkHeight = int(r.json()['data']['block']['height'])
             else:
                 networkHeight = 'n/a'
-                logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+                logerr('ERROR: Response code %s when accessing local API' % (r.status_code))
         except Exception as e:
             logerr("ERROR: Exception raised getting local /blockchain", e)
             #traceback.print_exc()
@@ -128,14 +128,14 @@ def getNetwork():
                 if (nodeRank.value == nodeRank.prevValue):
                     nodeRank.notif = ''
                 else:
-                    nodeRank.notif = 'Rank changed by %s from %d to %d' % \
-                        ('inf' if (type(nodeRank.prevValue) == str) else abs(nodeRank.value - nodeRank.prevValue), \
+                    nodeRank.notif = 'Rank new:`{2}` old: `{1}` ∆: `{0}`'.format( \
+                        ('inf' if (type(nodeRank.prevValue) == str) else (nodeRank.value - nodeRank.prevValue), \
                         nodeRank.prevValue, \
-                        nodeRank.value)
+                        nodeRank.value))
             else:
                 nodeRank.value = 'n/a'
                 lastForged = 'n/a'
-                logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+                logerr('ERROR: Response code %s when accessing local API' % (r.status_code))
         except Exception as e:
             logerr("ERROR: Exception raised getting local /delegates", e)
             #traceback.print_exc()
@@ -162,7 +162,7 @@ def getNetwork():
                     nodeVoters.notif = ''
             else:
                 nodeVoters.setValue('n/a', lambda x: True)
-                logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+                logerr('ERROR: Response code %s when accessing local API' % (r.status_code))
         except Exception as e:
             logerr("ERROR: Exception raised getting local /voters", e)
             #traceback.print_exc()
@@ -177,7 +177,7 @@ def getNetwork():
         else:
             relayInSync.setValue('n/a', lambda x: True)
             relayLag.value = 'n/a'
-            logerr('ERROR: Response code %d when accessing local API' % (r.status_code))
+            logerr('ERROR: Response code %s when accessing local API' % (r.status_code))
     except Exception as e:
         logerr("ERROR: Exception raised getting local /syncing", e)
         #traceback.print_exc()
@@ -193,7 +193,7 @@ def getNetwork():
         else:
             nodeLatency.value = 'n/a'
             peerSwVersion = 'n/a'
-            logerr('ERROR: Response code %d when accessing network API' % (r.status_code))
+            logerr('ERROR: Response code %s when accessing network API' % (r.status_code))
     except Exception as e:
         logerr("ERROR: Exception raised in Network /peers", e)
         #traceback.print_exc()
@@ -208,7 +208,7 @@ def getNetwork():
             #lastReleaseDate = r.json()[0]['published_at']
         else:
             lastReleaseVers = '--'
-            logerr('ERROR: Response code %d when accessing Last Release in Github' % (r.status_code))
+            logerr('ERROR: Response code %s when accessing Last Release in Github' % (r.status_code))
             #lastReleaseDate = 'N/A'
     except Exception as e:
         logerr("ERROR: Exception raised getting Last Release", e)
@@ -378,6 +378,20 @@ def heartbeat():
     print('INFO: >>> heartbeat run complete ...', datetime.datetime.now())
 
 
+def servicemsg(state=0):
+    embed = DiscordEmbed()
+    if (state == 0):
+        msg='INFO: >>> starting Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
+    else:
+        msg='INFO: <<< stopping Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
+    embed.set_description(msg)
+    embed.set_author(name='DELEGATE '+conf.delegate.upper()+" NOTIFICATION")
+    embed.set_footer(text='Notifs by Lazy Delegate')
+    embed.set_timestamp()
+    print(msg)
+    discordpush([embed])
+
+
 def discordpush(embeds, alert=False, alerts=0):
     if conf.discordhook is not None:
         webhook = DiscordWebhook(url=conf.discordhook)
@@ -393,11 +407,19 @@ def discordpush(embeds, alert=False, alerts=0):
             logerr('ERROR: Discord webhook failed! Response is: ', response)
 
 
+def sighandler(signum, frame):
+    schedule.clear()
+    servicemsg(1)
+    time.sleep(5) # Allow for discord message and any cleanup
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, sighandler)
+signal.signal(signal.SIGTERM, sighandler)
 
 '''
 MAIN
 '''
-print('INFO: >>> starting Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now())))
+servicemsg(0)
 conf = Config()
 if (conf.error):
     logerr("FATAL ERROR: config file not found:")
@@ -421,7 +443,7 @@ probes       += [relayproc]
 
 if (conf.chk_forger):
     forgerproc  = Probe('Forger proc', init='--')
-    nodeRank    = Probe('Rank', limit=conf.delegates)
+    nodeRank    = Probe('Rank', limit=conf.ranklimit)
     missedBlocks= Probe('Blockmiss', limit=0)
     nodeVoters  = Probe('Voters', init='--')
     probes     += [forgerproc, nodeRank, missedBlocks, nodeVoters]

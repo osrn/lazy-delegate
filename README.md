@@ -116,6 +116,12 @@ Registered delegate name for the forger node
 
 <br>
 
+**RANKLIMIT=52**
+
+Alert will be produced when rank > RANKLIMIT
+
+<br>
+
 **LOCAL_API='http://127.0.0.1:6003/api'**
 
 Default is local node to query API. However, this can be set to any relay node with public API
@@ -212,6 +218,13 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.6b**
+
+script start/stop handler
+- added handler for SIGINT and SIGTERM for cleanup and service status notification
+- added configurable rank alert limit
+<br>
+
 **v0.56b**
 
 notification and alert improvements

@@ -31,6 +31,7 @@ class Config():
 
             self.delegate    = config.get('DELEGATE_NAME','name')
             self.delegates   = int(config.get('DELEGATES','53'))
+            self.ranklimit   = int(config.get('RANKLIMIT','52'))
             self.localapi    = config.get('LOCAL_API','http://'+self.nodelocal+':'+str(self.apiport)+'/api')
             self.netapi      = config.get('NET_API', self.localapi)
             self.chaingithub = config.get('CHAIN_GITHUB', 'https://api.github.com/repos/Solar-network/core/releases')
