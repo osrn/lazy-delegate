@@ -128,7 +128,7 @@ def getNetwork():
                 if (nodeRank.value == nodeRank.prevValue):
                     nodeRank.notif = ''
                 else:
-                    nodeRank.notif = 'Rank new: **{0}** old: **{1}** ∆: **2**'.format(nodeRank.value, nodeRank.prevValue, \
+                    nodeRank.notif = 'Rank new: **{0}** old: **{1}** ∆: **{2}**'.format(nodeRank.value, nodeRank.prevValue, \
                         'inf' if (type(nodeRank.prevValue) == str) else (nodeRank.prevValue - nodeRank.value))
             else:
                 nodeRank.value = 'n/a'
