@@ -128,10 +128,8 @@ def getNetwork():
                 if (nodeRank.value == nodeRank.prevValue):
                     nodeRank.notif = ''
                 else:
-                    nodeRank.notif = 'Rank new:`{2}` old: `{1}` ∆: `{0}`'.format( \
-                        ('inf' if (type(nodeRank.prevValue) == str) else (nodeRank.value - nodeRank.prevValue), \
-                        nodeRank.prevValue, \
-                        nodeRank.value))
+                    nodeRank.notif = 'Rank new: **{0}** old: **{1}** ∆: **2**'.format(nodeRank.value, nodeRank.prevValue, \
+                        'inf' if (type(nodeRank.prevValue) == str) else (nodeRank.prevValue - nodeRank.value))
             else:
                 nodeRank.value = 'n/a'
                 lastForged = 'n/a'
@@ -226,7 +224,7 @@ def health_checks():
     global lastProbeTime
     lastProbeTime = datetime.datetime.now()
 
-    print('INFO: >>> starting health checks ...', datetime.datetime.now())
+    print('INFO: starting health checks ...', datetime.datetime.now())
     getHostStatus()
     getProcesses()
     getNetwork()
@@ -293,7 +291,7 @@ def health_checks():
         
         discordpush(embeds,tShouldAlert,alerts=len(embed1.get_embed_fields()))
 
-    print('INFO: >>> health check run complete ...', datetime.datetime.now(), end='\n\n')
+    print('INFO: health check run complete ...', datetime.datetime.now(), end='\n\n')
 
 
 
@@ -304,7 +302,7 @@ HEARTBEAT FACILITY
 def heartbeat():
     global relayHeight
 
-    print('INFO: >>> starting heartbeat ...', datetime.datetime.now())
+    print('INFO: starting heartbeat ...', datetime.datetime.now())
     embeds = []
     totAlerts = 0
     # Embed 0: Insert node stats
@@ -375,15 +373,15 @@ def heartbeat():
 
     logdbg('sending discord message ...')
     discordpush(embeds, (totAlerts > 0), totAlerts)
-    print('INFO: >>> heartbeat run complete ...', datetime.datetime.now())
+    print('INFO: heartbeat run complete ...', datetime.datetime.now())
 
 
 def servicemsg(state=0):
     embed = DiscordEmbed()
     if (state == 0):
-        msg='INFO: >>> starting Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
+        msg='INFO: > Starting Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
     else:
-        msg='INFO: <<< stopping Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
+        msg='INFO: < Stopping Lazy Delegate Monitor %s ... @ %s' % (__version__, str(datetime.datetime.now()))
     embed.set_description(msg)
     embed.set_author(name='DELEGATE '+conf.delegate.upper()+" NOTIFICATION")
     embed.set_footer(text='Notifs by Lazy Delegate')
@@ -419,8 +417,8 @@ signal.signal(signal.SIGTERM, sighandler)
 '''
 MAIN
 '''
-servicemsg(0)
 conf = Config()
+servicemsg(0)
 if (conf.error):
     logerr("FATAL ERROR: config file not found:")
     quit()

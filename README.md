@@ -222,7 +222,7 @@ A heartbeat status report is sent in regular intervals. Any missing report shoul
 
 script start/stop handler
 - added handler for SIGINT and SIGTERM for cleanup and service status notification
-- added configurable rank alert limit
+- added rank alert limit. To set, add `RANKLIMIT=xx` in the config. Default value is `52`.
 <br>
 
 **v0.56b**
