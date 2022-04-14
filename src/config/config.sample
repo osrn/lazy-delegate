@@ -32,6 +32,7 @@ LOCAL_API='http://127.0.0.1:6003/api'
 NET_API='https://sxp.mainnet.sh/api'
 #NET_API='https://sxp.testnet.sh/api'
 CHAIN_GITHUB='https://api.github.com/repos/Solar-network/core/releases'
+PRERELEASE=0
 
 ## Network performance thresholds
 LATENCY_THRESHOLD=500

@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json, signal, sys
 #import traceback
 
-__version__     = '0.6b'
+__version__     = '0.61b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -200,12 +200,16 @@ def getNetwork():
 
     # Fetch from Github
     try:
+        lastReleaseVers = '--'
         r = requests.get(conf.chaingithub)
         if r.status_code == 200:
-            lastReleaseVers = r.json()[0]['name']
-            #lastReleaseDate = r.json()[0]['published_at']
+            allreleases=r.json()
+            for rel in allreleases:
+                if (rel['prerelease'] == conf.prerelease):
+                    lastReleaseVers = rel['name']
+                    #lastReleaseDate = rel['published_at']
+                    break
         else:
-            lastReleaseVers = '--'
             logerr('ERROR: Response code %s when accessing Last Release in Github' % (r.status_code))
             #lastReleaseDate = 'N/A'
     except Exception as e:

@@ -35,6 +35,7 @@ class Config():
             self.localapi    = config.get('LOCAL_API','http://'+self.nodelocal+':'+str(self.apiport)+'/api')
             self.netapi      = config.get('NET_API', self.localapi)
             self.chaingithub = config.get('CHAIN_GITHUB', 'https://api.github.com/repos/Solar-network/core/releases')
+            self.prerelease  = bool(int(config.get('PRERELEASE', 0)))
 
             self.probe_cycle = int(config.get('PROBE_CYCLE','120'))
             self.heartbeat_cycle = int(config.get('HEARTBEAT_CYCLE','3600'))

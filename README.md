@@ -134,6 +134,12 @@ Best to point to the public API for the network. Yet, it is ok to set to any rel
 
 <br>
 
+**PRERELEASE=0**
+
+Set to 0 for Mainnet and 1 if Testnet
+
+<br>
+
 **PROBE_CYCLE = 120**
 
 Probe execution (health check) interval in seconds. Notice that a value < 60 may suffer from github API rate limiting with a 403 Forbidden response.
@@ -218,6 +224,12 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.61b**
+
+fix: testnet release version
+- added config option `PRERELEASE` to specify which core version to check against; release(0) and prelease(1) branches
+<br>
+
 **v0.6b**
 
 script start/stop handler
