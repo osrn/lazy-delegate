@@ -24,12 +24,12 @@ __**Network status**__
 <br>
 
 # Sample message snapshots
-**Periodic Heartbeat** ![Periodic Heartbeat](/img/notif-sample-01.png?raw=true)
+**Periodic Heartbeat** ![Periodic Heartbeat](img/notif-sample-01.png?raw=true)
 
-**Voter & rank notifications** ![Voter & rank notifications](/img/notif-sample-02.png?raw=true)
+**Voter & rank notifications** ![Voter & rank notifications](img/notif-sample-02.png?raw=true)
 
-**Alert for a single issue** ![Alert for a single issue](/img/notif-sample-04.png?raw=true)
+**Alert for a single issue** ![Alert for a single issue](img/notif-sample-04.png?raw=true)
 
-**Alert raise and cease** ![Alert raise and cease](/img/notif-sample-03.png?raw=true)
+**Alert raise and cease** ![Alert raise and cease](img/notif-sample-03.png?raw=true)
 
-**Heartbeat with issues, which cleared afterwards** ![Heartbeat with issues, which cleared afterwards](/img/notif-sample-05.png?raw=true)
+**Heartbeat with issues, which cleared afterwards** ![Heartbeat with issues, which cleared afterwards](img/notif-sample-05.png?raw=true)
