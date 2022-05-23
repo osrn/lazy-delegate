@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 import psutil, pytz, requests, datetime, schedule, time, os, subprocess, json, signal, sys
 #import traceback
 
-__version__     = '0.61b'
+__version__     = '0.62b'
 __version_info__= tuple([ num for num in __version__.split('.')])
 __author__      = "osrn"
 __email__       = "osrn.network@gmail.com"
@@ -123,7 +123,22 @@ def getNetwork():
             r = requests.get(conf.localapi+'/delegates/'+conf.delegate)
             if r.status_code == 200:
                 nodeRank.value = int(r.json()['data']['rank'])
-                lastForged = int(r.json()['data']['blocks']['last']['height']) if (int(r.json()['data']['blocks']['produced']) > 0) else 0
+                produced = int(r.json()['data']['blocks']['produced'])
+                if (produced == 0):
+                    lastForged = 0
+                else:
+                    lastForged = r.json()['data']['blocks']['last']
+                    try:
+                        r = requests.get(conf.localapi+'/blocks/'+lastForged)
+                        if r.status_code == 200:
+                            lastForged = int(r.json()['data']['height'])
+                        else:
+                            lastForged = 'n/a'
+                            logerr('ERROR: Response code %s when accessing local API' % (r.status_code))
+                    except Exception as e:
+                        logerr("ERROR: Exception raised getting local /blocks", e)
+                        #traceback.print_exc()
+                        lastForged = 'n/a'
 
                 if (nodeRank.value == nodeRank.prevValue):
                     nodeRank.notif = ''
@@ -408,12 +423,12 @@ def discordpush(embeds, alert=False, alerts=0):
         except:
             logerr('ERROR: Discord webhook failed! Response is: ', response)
 
+exitSignal=False
 
 def sighandler(signum, frame):
-    schedule.clear()
-    servicemsg(1)
-    time.sleep(5) # Allow for discord message and any cleanup
-    sys.exit(0)
+    global exitSignal
+    exitSignal=True
+    return
 
 signal.signal(signal.SIGINT, sighandler)
 signal.signal(signal.SIGTERM, sighandler)
@@ -473,4 +488,12 @@ schedule.run_all() # cause run_pending() does not immediately start jobs but wai
 
 while True:
     schedule.run_pending()
+    if exitSignal:
+        print("SIG received. Terminating...")
+        schedule.clear()
+        servicemsg(1)
+        time.sleep(2) # Allow for discord message and any cleanup
+        sys.exit(0)
     time.sleep(1)
+
+

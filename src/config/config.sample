@@ -22,7 +22,7 @@ CHK_POOL=1
 NODE_LOCAL=127.0.0.1
 # API server port
 API_PORT=6003
-# Delegate Note (Forger) external IP
+# Forger/Relay Node external IP
 NODE_IP=xx.xx.xx.xx
 DELEGATE_NAME='xxxx'
 DELEGATES=53

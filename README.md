@@ -224,6 +224,12 @@ Probe class is responsible for keeping track of the values and governing the ala
 A heartbeat status report is sent in regular intervals. Any missing report should indicate a problem with the host, node or lazy-delegate app itself.
 
 ## Change Log
+**v0.62b**
+
+Solar Core 3.3.0-next.3 API compatibility
+- Adaptation for Solar Core 3.3.0-next.3 API change for use of block id in delegate attribute
+<br>
+
 **v0.61b**
 
 fix: testnet release version
